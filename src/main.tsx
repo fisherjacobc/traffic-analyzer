@@ -3,12 +3,17 @@ import { createRoot } from "react-dom/client"
 
 import "./index.css"
 import App from "./App.tsx"
-import { ThemeProvider } from "@/components/theme-provider.tsx"
+
+const scheme = window.matchMedia('(prefers-color-scheme: dark)')
+
+const applyTheme = (dark: boolean) =>
+  document.documentElement.classList.toggle('dark', dark)
+
+applyTheme(scheme.matches)
+scheme.addEventListener('change', (event) => applyTheme(event.matches))
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <App />
   </StrictMode>
 )
