@@ -75,3 +75,15 @@ export const createEvent = (type: EventType): SessionEvent => ({
   type,
   timestamp: new Date().toISOString(),
 })
+
+export function downloadSession(session: Session) {
+  const blob = new Blob([JSON.stringify(session, null, 2)], {
+    type: "application/json",
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = `${session.recorder.replace(/\s+/g, "_")}_${session.id}.json`
+  link.click()
+  URL.revokeObjectURL(url)
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Check, Copy, Undo2 } from "lucide-react"
+import { Check, Copy, Download, Undo2 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ import {
   recorders,
   subjects,
   createEvent,
+  downloadSession,
   loadSessions,
   saveSessions,
   type EventType,
@@ -263,14 +264,26 @@ function SessionList({ sessions }: { sessions: Session[] }) {
               {session.endedAt && ` – ${formatTime(session.endedAt)}`} ·{" "}
               {session.events.length} events
             </CardDescription>
-            <CardAction>
+            <CardAction className="flex gap-2">
               <Button
                 variant="outline"
                 disabled={session.endedAt === null}
                 onClick={() => copy(session)}
+                aria-label="Copy JSON"
               >
                 {copiedId === session.id ? <Check /> : <Copy />}
-                {copiedId === session.id ? "Copied" : "Copy JSON"}
+                <span className="hidden sm:inline">
+                  {copiedId === session.id ? "Copied" : "Copy JSON"}
+                </span>
+              </Button>
+              <Button
+                variant="outline"
+                disabled={session.endedAt === null}
+                onClick={() => downloadSession(session)}
+                aria-label="Download JSON"
+              >
+                <Download />
+                <span className="hidden sm:inline">Download</span>
               </Button>
             </CardAction>
           </CardHeader>
