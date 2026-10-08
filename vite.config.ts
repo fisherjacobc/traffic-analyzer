@@ -1,55 +1,45 @@
 import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { defineConfig, type Plugin } from "vite"
-import fs from "fs";
-
-function handleCount(label: string) {
-  const line = JSON.stringify({ timestamp: new Date().toISOString(), type: label }) + "\n";
-
-  fs.appendFile("./data.json", line, 'utf8', (err) => {
-    if (err) console.error("Error appending to file:", err);
-  });
-}
-
-function countApi(): Plugin {
-  return {
-    name: "count-api",
-    configureServer(server) {
-      server.middlewares.use("/api/count", (req, res) => {
-        if (req.method !== "POST") {
-          res.statusCode = 405
-          return res.end()
-        }
-
-        let body = ""
-        req.on("data", (chunk) => (body += chunk))
-        req.on("end", () => {
-          try {
-            const { label } = JSON.parse(body)
-            if (typeof label !== "string") throw new Error("missing label")
-            handleCount(label)
-            res.statusCode = 204
-            res.end()
-          } catch {
-            res.statusCode = 400
-            res.end()
-          }
-        })
-      })
-    },
-  }
-}
+import { defineConfig } from "vite"
+import { VitePWA } from "vite-plugin-pwa"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), countApi()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: "autoUpdate",
+      includeAssets: ["icon.svg"],
+      manifest: {
+        name: "Traffic Analyzer",
+        short_name: "Traffic",
+        description: "Record traffic events in timed sessions",
+        theme_color: "#18181b",
+        background_color: "#18181b",
+        display: "standalone",
+        start_url: "/",
+        icons: [
+          {
+            src: "icon.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any",
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+      },
+    }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-    allowedHosts: [".trycloudflare.com", "peoplecounter.fishrlab.net"]
-  }
+    allowedHosts: [".trycloudflare.com", "peoplecounter.fishrlab.net"],
+  },
 })
