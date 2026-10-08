@@ -42,4 +42,11 @@ export default defineConfig({
   server: {
     allowedHosts: [".trycloudflare.com", "peoplecounter.fishrlab.net"],
   },
+  // Same port as the dev server so the tunnel works with either. Use preview
+  // (the production build) when testing offline: the dev server has no
+  // service worker.
+  preview: {
+    port: 5173,
+    allowedHosts: [".trycloudflare.com", "peoplecounter.fishrlab.net"],
+  },
 })
